@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scene3d dev</title>
+<link rel="stylesheet" href="../vendor/fonts-inline.css">
+<link rel="stylesheet" href="../base.css">
+<link rel="stylesheet" href="scene3d.css">
+<style>
+  body { padding-block: 1rem; }
+  #s3dPanel { max-width: 800px; }
+  #s3dHost { height: 450px; }
+  #s3dPanel.is-max, #s3dPanel:fullscreen { max-width: none; }
+  #s3dPanel.is-max #s3dHost, #s3dPanel:fullscreen #s3dHost { height: auto; flex: 1 1 auto; min-height: 0; }
+  .dev { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; padding: 0.5rem 0.8rem; border-top: 1px solid var(--line); }
+  .dev .range { max-width: 260px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel" id="s3dPanel">
+    <div class="panel__bar">
+      <span class="panel__title">3D-вид</span>
+      <button class="btn" data-cam="iso" type="button">Общий</button>
+      <button class="btn" data-cam="top" type="button">Сверху</button>
+      <button class="btn" data-cam="front" type="button">Спереди</button>
+      <button class="btn" data-cam="side" type="button">Сбоку</button>
+      <button class="btn" id="labelsBtn" type="button" aria-pressed="false">Подписи</button>
+      <button class="btn" data-fs type="button">Весь экран</button>
+    </div>
+    <div class="panel__body" id="s3dHost"></div>
+    <div class="dev">
+      <button class="btn" data-step="0" type="button">Шаг 1</button>
+      <button class="btn" data-step="1" type="button">Шаг 2</button>
+      <button class="btn" data-step="2" type="button">Шаг 3</button>
+      <button class="btn" data-step="3" type="button">Шаг 4</button>
+      <label for="potRange">pot</label>
+      <input class="range" id="potRange" type="range" min="0" max="1023" value="512">
+      <output id="potOut">512</output>
+      <button class="btn" id="pressBtn" type="button">Нажать кнопку</button>
+      <label for="itemSel">Деталь</label>
+      <select id="itemSel"></select>
+    </div>
+  </div>
+</div>
+<script src="../core.js"></script>
+<script src="../circuit.js"></script>
+<script src="../sketches.js"></script>
+<script src="../widgets.js"></script>
+<script src="../vendor/three.min.js"></script>
+<script src="../vendor/OrbitControls.js"></script>
+<script src="scene3d.js"></script>
+<script>
+  const { CIRCUIT, set, press, state } = MapLab;
+  const view = (window.view = MapLab.createScene3D(document.getElementById('s3dHost'), { step: 0 }));
+  document.querySelectorAll('[data-cam]').forEach((b) => b.addEventListener('click', () => view.setCamera(b.dataset.cam)));
+  document.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => set({ step: +b.dataset.step, soundMode: false })));
+  const labelsBtn = document.getElementById('labelsBtn');
+  labelsBtn.addEventListener('click', () => {
+    const on = labelsBtn.getAttribute('aria-pressed') !== 'true';
+    labelsBtn.setAttribute('aria-pressed', on);
+    view.setLabels(on);
+  });
+  const pot = document.getElementById('potRange');
+  pot.addEventListener('input', () => set({ pot: +pot.value }));
+  MapLab.on((s) => {
+    pot.value = s.pot;
+    pot.style.setProperty('--fill', (s.pot / 10.23).toFixed(1) + '%');
+    document.getElementById('potOut').textContent = s.pot;
+  });
+  const pressBtn = document.getElementById('pressBtn');
+  pressBtn.addEventListener('pointerdown', () => press(true));
+  pressBtn.addEventListener('pointerup', () => press(false));
+  const sel = document.getElementById('itemSel');
+  sel.innerHTML = '<option value="">все</option>' + CIRCUIT.ITEMS.map((it, i) => '<option value="' + i + '">' + (i + 1) + '. ' + it.title + '</option>').join('');
+  sel.addEventListener('change', () => {
+    const i = sel.value === '' ? null : +sel.value;
+    view.setUpto(i);
+    view.highlight(i == null ? null : CIRCUIT.ITEMS[i].id);
+  });
+</script>
+</body>
+</html>

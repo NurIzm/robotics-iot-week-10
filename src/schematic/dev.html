@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Схема: проверка</title>
+<link rel="stylesheet" href="../vendor/fonts-inline.css">
+<link rel="stylesheet" href="../base.css">
+<link rel="stylesheet" href="schematic.css">
+<style>
+  .dev-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; padding-block: 0.75rem; }
+  .dev-pot { flex: 1 1 14rem; display: flex; gap: 0.75rem; align-items: center; }
+  .dev-pot output { font: 600 1rem var(--font-mono); color: var(--in); min-width: 3.5em; }
+  #sch-panel { width: 100%; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="dev-bar">
+    <button class="btn" type="button" data-step="0">Шаг 1</button>
+    <button class="btn" type="button" data-step="1">Шаг 2</button>
+    <button class="btn" type="button" data-step="2">Шаг 3</button>
+    <button class="btn" type="button" data-step="3">Шаг 4</button>
+    <button class="btn" type="button" id="dev-labels">Подписи</button>
+    <button class="btn" type="button" id="dev-theme">Тема</button>
+    <label class="dev-pot" for="dev-pot">
+      <input class="range" id="dev-pot" type="range" min="0" max="1023" step="1">
+      <output id="dev-pot-out"></output>
+    </label>
+    <span class="small" id="dev-picked" role="status"></span>
+  </div>
+  <div class="panel" id="sch-panel">
+    <div class="panel__bar">
+      <span class="panel__title">Схема подключения</span>
+      <button class="btn btn--icon" type="button" data-fs aria-label="На весь экран" title="На весь экран">⛶</button>
+    </div>
+    <div class="panel__body" id="sch-host"></div>
+  </div>
+</main>
+<script src="../core.js"></script>
+<script src="../circuit.js"></script>
+<script src="../sketches.js"></script>
+<script src="../widgets.js"></script>
+<script src="schematic.js"></script>
+<script>
+  const { state, set, on, createSchematic } = MapLab;
+  const picked = document.getElementById('dev-picked');
+  window.view = createSchematic(document.getElementById('sch-host'), {
+    onPick: (id, kind) => (picked.textContent = kind + ': ' + id),
+  });
+  document.querySelectorAll('button[data-step]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const step = +b.dataset.step;
+      set({ step, upto: null, soundMode: step === 3 ? state.soundMode : false });
+    })
+  );
+  const pot = document.getElementById('dev-pot');
+  const out = document.getElementById('dev-pot-out');
+  pot.addEventListener('input', () => set({ pot: +pot.value }));
+  on((s) => {
+    pot.value = s.pot;
+    pot.style.setProperty('--fill', (s.pot / 10.23).toFixed(1) + '%');
+    out.textContent = s.pot;
+    document.querySelectorAll('button[data-step]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.step === s.step)));
+  });
+  let labels = true;
+  document.getElementById('dev-labels').addEventListener('click', () => view.setLabels((labels = !labels)));
+  document.getElementById('dev-theme').addEventListener('click', () => {
+    const root = document.documentElement;
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+</script>
+</body>
+</html>

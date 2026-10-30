@@ -1,0 +1,104 @@
+<section id="lab" class="section">
+  <div class="wrap">
+    <header class="section__head">
+      <p class="eyebrow">Часть 3 из 5</p>
+      <h2>Собираем «Музыкальный регулятор»</h2>
+      <p class="lede">Идём по четырём шагам. Схема и код меняются вместе. Крути ручку на схеме или двигай ползунок: всё работает как настоящая плата.</p>
+    </header>
+
+    <div class="wb-steps" id="wb-steps" role="group" aria-label="Шаги проекта"></div>
+    <p class="wb-task"><span class="eyebrow" id="wb-task-label">Шаг 1</span> <span id="wb-task"></span></p>
+
+    <div class="wb-bench">
+      <article class="panel wb-panel" id="wb-diagram" aria-label="Схема подключения">
+        <div class="panel__bar">
+          <h3 class="panel__title">Схема подключения</h3>
+          <div class="wb-seg" role="group" aria-label="Вид схемы">
+            <button class="btn" type="button" id="wb-view-2d" aria-pressed="true">2D</button>
+            <button class="btn" type="button" id="wb-view-3d" aria-pressed="false">3D</button>
+          </div>
+          <div class="wb-seg" id="wb-cams" role="group" aria-label="Положение камеры" hidden>
+            <button class="btn" type="button" data-cam="iso">Общий</button>
+            <button class="btn" type="button" data-cam="top">Сверху</button>
+            <button class="btn" type="button" data-cam="front">Спереди</button>
+            <button class="btn" type="button" data-cam="side">Сбоку</button>
+          </div>
+          <button class="btn" type="button" id="wb-labels" aria-pressed="true">Подписи</button>
+          <button class="btn btn--icon" type="button" data-fs aria-label="На весь экран" title="На весь экран">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6V2h4M12 2h4v4M16 12v4h-4M6 16H2v-4"/></svg>
+          </button>
+        </div>
+        <div class="panel__body wb-stage">
+          <div class="wb-view" id="wb-2d"></div>
+          <div class="wb-view" id="wb-3d" hidden></div>
+        </div>
+        <div class="wb-assembly" id="wb-assembly">
+          <button class="btn" type="button" id="wb-asm-prev">Назад</button>
+          <p class="wb-assembly__text" id="wb-asm-text" aria-live="polite"></p>
+          <button class="btn" type="button" id="wb-asm-next">Дальше</button>
+          <button class="btn" type="button" id="wb-asm-all">Показать всё</button>
+        </div>
+        <div class="wb-controls" id="wb-controls-diagram"></div>
+      </article>
+
+      <article class="panel wb-panel wb-panel--code" id="wb-code" aria-label="Код">
+        <div class="panel__bar">
+          <h3 class="panel__title">Код <code class="wb-file" id="wb-file"></code></h3>
+          <button class="btn" type="button" id="wb-font-down" aria-label="Уменьшить шрифт кода">A−</button>
+          <button class="btn" type="button" id="wb-font-up" aria-label="Увеличить шрифт кода">A+</button>
+          <button class="btn" type="button" id="wb-copy">Копировать</button>
+          <button class="btn btn--icon" type="button" data-fs aria-label="На весь экран" title="На весь экран">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 6V2h4M12 2h4v4M16 12v4h-4M6 16H2v-4"/></svg>
+          </button>
+        </div>
+        <div class="panel__body wb-codebody" tabindex="0" aria-label="Текст программы">
+          <div class="code wb-code" id="wb-code-view"></div>
+        </div>
+        <div class="wb-serial" id="wb-serial">
+          <div class="wb-serial__bar">
+            <span class="wb-serial__name">Serial Monitor</span>
+            <button class="btn" type="button" id="wb-serial-pause" aria-pressed="false">Пауза</button>
+            <button class="btn" type="button" id="wb-serial-clear">Очистить</button>
+          </div>
+          <pre class="wb-serial__out" id="wb-serial-out" aria-label="Вывод Serial Monitor"></pre>
+        </div>
+        <div class="wb-controls wb-controls--code" id="wb-controls-code"></div>
+      </article>
+    </div>
+
+    <div class="wb-below">
+      <section class="wb-block" aria-labelledby="wb-build-title">
+        <h3 id="wb-build-title">Что собираем на этом шаге</h3>
+        <p class="small" id="wb-build-note">Нажми на строку, и схема покажет этот шаг сборки.</p>
+        <ol class="wb-list" id="wb-list"></ol>
+      </section>
+      <section class="wb-block" aria-labelledby="wb-how-title">
+        <h3 id="wb-how-title">Что происходит</h3>
+        <p id="wb-what"></p>
+        <h4>Разбираем код</h4>
+        <ul class="wb-notes" id="wb-notes"></ul>
+        <h4>Проверь себя</h4>
+        <ul class="wb-notes" id="wb-try"></ul>
+      </section>
+    </div>
+
+    <section class="wb-block wb-block--wide" aria-labelledby="wb-bom-title" id="wb-bom-box">
+      <h3 id="wb-bom-title">Что понадобится на весь проект</h3>
+      <ul class="wb-bom" id="wb-bom"></ul>
+    </section>
+
+    <section class="wb-block wb-block--wide" aria-labelledby="wb-fix-title">
+      <h3 id="wb-fix-title">Если не работает</h3>
+      <div class="wb-fixes">
+        <div><h4>Светодиод не горит совсем</h4><p>Проверь, что самая длинная ножка стоит в c22, перемычка идёт из a22 в рейку «−», а рейка соединена с GND на Arduino. Всё так? Тогда, скорее всего, у тебя RGB-светодиод с общим анодом: его длинная ножка идёт на 5V. Перекинь перемычку из a22 в рейку «+», а в коде пиши <code>analogWrite(redPin, 255 - brightness)</code>, и так же для greenPin и bluePin.</p></div>
+        <div><h4>Buzzer пищит одной нотой</h4><p>Это активный buzzer, у него внутри свой генератор. Для <code>tone()</code> нужен пассивный. Проверка: подключи «+» к 5V, а «−» к GND. Активный запищит сам, пассивный только щёлкнет.</p></div>
+        <div><h4>В Serial Monitor странные символы</h4><p>В окне Serial Monitor выбери скорость 9600, как в <code>Serial.begin(9600)</code>.</p></div>
+        <div><h4>Числа скачут, хотя ручку никто не трогает</h4><p>Проверь провод от средней ножки к A0. Если он не подключён, пин ловит случайные наводки. Дрожание на 1–2 единицы при подключённом проводе нормально.</p></div>
+        <div><h4>Ручка работает наоборот</h4><p>Поменяй местами 5V и GND на крайних ножках потенциометра. Или переверни шкалу в коде: <code>map(potValue, 0, 1023, 255, 0)</code>.</p></div>
+        <div><h4>Кнопка ничего не меняет</h4><p>Провода должны идти на разные столбцы: пин 2 в столбец 10, GND в столбец 12. Если оба на одном столбце, пин 2 всегда соединён с GND и нажатие ни на что не влияет.</p></div>
+        <div><h4>Почему светодиод не на пинах 3 и 11</h4><p><code>tone()</code> занимает таймер, от которого работает <code>analogWrite</code> на пинах 3 и 11. Поэтому яркость идёт через пины 5, 6 и 9.</p></div>
+      </div>
+      <p class="small wb-fixnote">На некоторых макетках буквы рядов идут в обратном порядке. Тогда ориентируйся по рисунку и номерам столбцов.</p>
+    </section>
+  </div>
+</section>

@@ -1,0 +1,275 @@
+<section id="hero" class="ex-hero ex-mat" aria-labelledby="ex-hero-title">
+  <div class="wrap ex-hero__in">
+    <div class="ex-hero__text">
+      <ul class="ex-hero__meta">
+        <li>Урок 10</li>
+        <li>2 часа</li>
+        <li>Проект «Музыкальный регулятор»</li>
+      </ul>
+      <h1 id="ex-hero-title"><span class="is-out">map()</span>&nbsp;— переводчик между шкалами</h1>
+      <p class="ex-hero__lead">Потенциометр говорит числами от 0 до 1023, светодиод понимает только от 0 до 255. map() переводит одно в другое и сохраняет долю пути.</p>
+    </div>
+    <figure class="ex-hero__led">
+      <div class="ex-led-box" id="ex-hero-led"></div>
+      <figcaption class="ex-call" id="ex-hero-call"></figcaption>
+    </figure>
+    <div class="ex-hero__rulers" id="ex-hero-rulers"></div>
+  </div>
+</section>
+
+<section id="why" class="section">
+  <div class="wrap">
+    <header class="section__head">
+      <p class="eyebrow">Часть 1 из 5</p>
+      <h2>Зачем нужен map()</h2>
+      <p class="lede">Потенциометр похож на ручку громкости: крутишь его, и плата получает число от 0 до 1023. Светодиод понимает только числа от 0 до 255. Двигай ползунок и сравни: левый светодиод получает число как есть, правый через map().</p>
+    </header>
+
+    <div class="ex-why">
+      <div class="ex-bench ex-mat">
+        <div class="ex-bench__leds">
+          <figure class="ex-bench__led">
+            <figcaption>Без map()</figcaption>
+            <div class="ex-led-box" id="ex-why-led-raw"></div>
+            <p class="ex-bench__num is-in" id="ex-why-raw">0</p>
+            <p class="ex-bench__note">отправили <span id="ex-why-raw-sent">512</span>, яркость <span id="ex-why-raw-got">0</span></p>
+            <code class="ex-bench__code">analogWrite(pin, pot);</code>
+          </figure>
+          <figure class="ex-bench__led">
+            <figcaption>С map()</figcaption>
+            <div class="ex-led-box" id="ex-why-led-map"></div>
+            <p class="ex-bench__num is-out" id="ex-why-map">127</p>
+            <p class="ex-bench__note">отправили <span id="ex-why-map-sent">127</span>, яркость <span id="ex-why-map-got">127</span></p>
+            <code class="ex-bench__code">analogWrite(pin, map(pot, 0, 1023, 0, 255));</code>
+          </figure>
+        </div>
+        <div class="ex-pot">
+          <div class="ex-pot__head">
+            <label for="ex-why-pot">Потенциометр</label>
+            <output class="ex-pot__value is-in" for="ex-why-pot" id="ex-why-pot-value">512</output>
+          </div>
+          <input class="range" id="ex-why-pot" type="range" min="0" max="1023" step="1" value="512">
+        </div>
+      </div>
+
+      <figure class="ex-chart">
+        <figcaption>
+          <h3>Настоящая яркость при каждом положении ручки</h3>
+          <ul class="ex-legend">
+            <li><i class="ex-key ex-key--raw"></i>Без map(): пила, яркость четыре раза проходит от 0 до 255</li>
+            <li><i class="ex-key ex-key--map"></i>С map(): ровная линия, один плавный рост от 0 до 255</li>
+          </ul>
+        </figcaption>
+        <div id="ex-why-chart"></div>
+        <p class="small">Обе линии посчитаны для всех 1024 положений ручки. Потяни мышью или пальцем по графику: ползунок поедет следом.</p>
+      </figure>
+    </div>
+
+    <div class="ex-why__more">
+      <div class="ex-why__text">
+        <span class="level">Всем</span>
+        <h3>Почему левый светодиод скачет</h3>
+        <p>Светодиод понимает числа только до 255. Если отправить больше, плата не выдаст ошибку. Она начнёт считать по кругу, как часы: после 12 снова идёт 1. Только здесь в круге 256 чисел, от 0 до 255.</p>
+        <p class="ex-why__now" id="ex-why-laps"></p>
+        <p>Шкала датчика ровно в четыре раза длиннее: 1024 числа против 256. Поэтому за один поворот ручки счёт проходит круг четыре раза: яркость растёт до 255, обрывается в ноль и растёт снова.</p>
+        <p>map() сжимает длинную шкалу до короткой. Весь поворот ручки становится одним плавным ростом яркости.</p>
+      </div>
+      <div class="ex-why__text">
+        <span class="level">8–9 класс</span>
+        <h3>Откуда четыре зубца: 10 бит и 8 бит</h3>
+        <p><code>analogRead()</code> отдаёт число из 10 бит. Десять двоичных разрядов дают 2<sup>10</sup>&nbsp;=&nbsp;1024 значения, от 0 до 1023. <code>analogWrite()</code> на Uno R3 записывает число в 8-битный регистр ШИМ. Это ячейка памяти: она задаёт, какую долю времени пин включён. Восемь разрядов дают 2<sup>8</sup>&nbsp;=&nbsp;256 значений, от 0 до 255.</p>
+        <div class="ex-bits" id="ex-bits" role="img" aria-label="Двоичная запись числа с потенциометра"></div>
+        <p>Старшие биты в регистр не помещаются и теряются. Остаётся <code id="ex-bits-eq"></code>. Операция <code>&amp;</code> оставляет только младшие 8 бит. Результат равен остатку от деления на 256.</p>
+        <p id="ex-bits-tooth"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="section section--alt">
+  <div class="wrap">
+    <header class="section__head">
+      <p class="eyebrow">Часть 2 из 5</p>
+      <h2>Как работает map()</h2>
+      <p class="lede">Идём от простого к сложному. Блоки «Всем» нужны каждому. Блоки с классом добавляют настоящую математику и подводные камни.</p>
+    </header>
+
+    <article class="ex-block" id="ex-idea">
+      <div class="ex-block__tag"><span class="ex-block__num">1</span><span class="level">Всем</span></div>
+      <div class="ex-block__main">
+        <h3>Главная мысль: доля пути сохраняется</h3>
+        <div class="ex-split">
+          <div class="prose">
+            <p>Представь две линейки разной длины. Прошёл половину первой, значит, и на второй ты на половине. Прошёл четверть, значит, и там четверть. Вот и всё, что делает <code>map()</code>.</p>
+            <p>Слово map по-английски значит «карта». На карте всё то же самое, что и на местности, только в другом масштабе. Если школа стоит на середине дороги от дома до реки, то и на карте она окажется на середине.</p>
+            <p>Пример с числами. В тесте 40 вопросов, ты верно ответил на 30. Это 3/4 пути. Учитель переводит ответы в баллы от 0 до 100. 3/4 от 100 равно 75.</p>
+            <p class="small">Шкалу от начала до конца называют диапазоном. Здесь один диапазон 0–40, другой 0–100.</p>
+          </div>
+          <div>
+            <div id="ex-test-rulers"></div>
+            <p class="ex-call ex-call--plain" id="ex-test-call"></p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="ex-block" id="ex-anatomy">
+      <div class="ex-block__tag"><span class="ex-block__num">2</span><span class="level">Всем</span></div>
+      <div class="ex-block__main">
+        <h3>Из чего состоит вызов map()</h3>
+        <p>В скобках пять чисел. Первое говорит, что переводим. Дальше идут две пары: откуда и куда.</p>
+        <div class="ex-args">
+          <span class="ex-args__brace">map(</span>
+          <div class="ex-arg ex-arg--in"><code>значение,</code><p>Число, которое переводим. У нас это <code>potValue</code>.</p></div>
+          <div class="ex-arg ex-arg--in"><code>откуда_от,</code><p>Начало шкалы датчика: 0.</p></div>
+          <div class="ex-arg ex-arg--in"><code>откуда_до,</code><p>Конец шкалы датчика: 1023.</p></div>
+          <div class="ex-arg ex-arg--out"><code>куда_от,</code><p>Начало новой шкалы: 0.</p></div>
+          <div class="ex-arg ex-arg--out"><code>куда_до</code><p>Конец новой шкалы: 255.</p></div>
+          <span class="ex-args__brace">)</span>
+        </div>
+        <pre class="code ex-line" data-ex-code>int brightness = map(potValue, 0, 1023, 0, 255);</pre>
+        <p>Читай так: возьми <code>potValue</code> со шкалы от 0 до 1023 и найди то же место на шкале от 0 до 255. Результат положи в <code>brightness</code>.</p>
+        <p class="small">Бирюзовый цвет на всей странице значит датчик и вход. Медный значит устройство и результат.</p>
+      </div>
+    </article>
+
+    <article class="ex-block" id="ex-lab">
+      <div class="ex-block__tag"><span class="ex-block__num">3</span><span class="level">Всем</span></div>
+      <div class="ex-block__main">
+        <h3>Лаборатория: меняй числа и смотри</h3>
+        <p>Выбери готовый набор или впиши свои числа. Двигай ползунок: результат считается той же формулой, что и на плате.</p>
+        <div class="ex-sets">
+          <div class="ex-sets__row">
+            <span class="ex-sets__name" id="ex-sets-main">Готовые наборы</span>
+            <div class="ex-sets__list" id="ex-lab-sets" role="group" aria-labelledby="ex-sets-main"></div>
+          </div>
+          <div class="ex-sets__row">
+            <span class="ex-sets__name" id="ex-sets-edge">Особые случаи</span>
+            <div class="ex-sets__list" id="ex-lab-edges" role="group" aria-labelledby="ex-sets-edge"></div>
+          </div>
+        </div>
+        <p class="ex-strip ex-mat ex-call" id="ex-lab-call"></p>
+        <div class="ex-fields">
+          <div class="ex-field ex-field--in ex-field--value">
+            <label for="ex-lab-x">значение</label>
+            <input id="ex-lab-x" type="number" step="1" min="-20000" max="20000">
+          </div>
+          <div class="ex-field ex-field--in">
+            <label for="ex-lab-in-min">откуда_от</label>
+            <input id="ex-lab-in-min" type="number" step="1" min="-20000" max="20000">
+          </div>
+          <div class="ex-field ex-field--in">
+            <label for="ex-lab-in-max">откуда_до</label>
+            <input id="ex-lab-in-max" type="number" step="1" min="-20000" max="20000">
+          </div>
+          <div class="ex-field ex-field--out">
+            <label for="ex-lab-out-min">куда_от</label>
+            <input id="ex-lab-out-min" type="number" step="1" min="-20000" max="20000">
+          </div>
+          <div class="ex-field ex-field--out">
+            <label for="ex-lab-out-max">куда_до</label>
+            <input id="ex-lab-out-max" type="number" step="1" min="-20000" max="20000">
+          </div>
+        </div>
+        <p class="ex-hint" id="ex-lab-hint" role="status" hidden></p>
+        <div class="ex-lab__rulers" id="ex-lab-rulers"></div>
+        <div class="ex-dead" id="ex-lab-dead" role="status" hidden>
+          <h4>Шкала без длины, результата нет</h4>
+          <p>Начало и конец шкалы входа совпали: <span id="ex-lab-dead-eq"></span>. В формуле мы делим на длину этой шкалы, то есть на 0. На ноль делить нельзя.</p>
+          <p>Поэтому здесь ответа нет. Настоящая плата ошибку не покажет, но выдаст бессмысленное число. Сделай концы шкалы разными.</p>
+        </div>
+        <ul class="ex-notes" id="ex-lab-notes"></ul>
+      </div>
+    </article>
+
+    <article class="ex-block" id="ex-hand">
+      <div class="ex-block__tag"><span class="ex-block__num">4</span><span class="level">7–9 класс</span></div>
+      <div class="ex-block__main">
+        <h3>Считаем вручную</h3>
+        <p>Вот формула из ядра Arduino. Подставляем числа из лаборатории: поменяй их выше, и разбор пересчитается.</p>
+        <pre class="code ex-line ex-formula"><span class="is-in">(значение − откуда_от)</span> × <span class="is-out">(куда_до − куда_от)</span> / <span class="is-in">(откуда_до − откуда_от)</span> + <span class="is-out">куда_от</span></pre>
+        <p class="small">В исходниках Arduino те же пять чисел называются <code>x</code>, <code>in_min</code>, <code>in_max</code>, <code>out_min</code>, <code>out_max</code>. Все они типа <code>long</code>, это большие целые числа. Поэтому и деление здесь целое.</p>
+        <div class="ex-hand">
+          <div id="ex-hand-steps"></div>
+          <div class="ex-algebra" id="ex-hand-algebra">
+            <h4>Та же формула в алгебре</h4>
+            <div id="ex-hand-graph"></div>
+            <div id="ex-hand-math"></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="ex-block" id="ex-pits">
+      <div class="ex-block__tag"><span class="ex-block__num">5</span><span class="level">8–9 класс</span></div>
+      <div class="ex-block__main">
+        <h3>Подводные камни</h3>
+        <p>Один ползунок на все четыре примера. Двигай его и смотри, где map() подводит.</p>
+        <div class="ex-pot ex-pits__bar">
+          <div class="ex-pot__head">
+            <label for="ex-pit-pot">Потенциометр (pot)</label>
+            <output class="ex-pot__value is-in" for="ex-pit-pot" id="ex-pit-pot-value">512</output>
+          </div>
+          <input class="range" id="ex-pit-pot" type="range" min="0" max="1023" step="1" value="512">
+        </div>
+
+        <section class="ex-pit" aria-labelledby="ex-pit-1">
+          <div class="ex-pit__text">
+            <h4 id="ex-pit-1">Дробь отбрасывается</h4>
+            <p>В <code>map(pot, 0, 1023, 0, 255)</code> при pot = <span id="ex-pit-at"></span> точный ответ равен <b id="ex-pit-exact"></b>, а map() вернёт <b id="ex-pit-cut"></b>. Дробь отбрасывается, округления нет.</p>
+            <p>На длинной шкале этого не видно. На короткой шкале это ловушка: в <code>map(pot, 0, 1023, 0, 3)</code> результат 3 выпадает только при 1023.</p>
+            <p>Для четырёх равных зон возьми обе верхние границы на единицу больше: <code>map(pot, 0, 1024, 0, 4)</code>. Значения 1024 и 4 никогда не появятся, зато зоны станут одинаковыми.</p>
+          </div>
+          <div class="ex-pit__live">
+            <div class="ex-zones" id="ex-zones-short"></div>
+            <div class="ex-zones" id="ex-zones-even"></div>
+            <p class="small">В полоске показан результат и сколько положений ручки к нему ведёт.</p>
+          </div>
+        </section>
+
+        <section class="ex-pit" aria-labelledby="ex-pit-2">
+          <div class="ex-pit__text">
+            <h4 id="ex-pit-2">map() не останавливается на краю</h4>
+            <p>Пусть датчик света в комнате выдаёт от 200 до 800. Числа взяты для примера. Стало темнее или светлее, и датчик вышел за эти границы. map() продолжит шкалу дальше и выдаст число за пределами 0–255.</p>
+            <p>Такое число <code>analogWrite()</code> снова пустит по кругу: при ярком свете светодиод вдруг потускнеет. Ограничить результат помогает <code>constrain()</code>.</p>
+            <pre class="code ex-line" data-ex-code>int level = map(light, 200, 800, 0, 255);
+level = constrain(level, 0, 255);</pre>
+          </div>
+          <dl class="ex-read">
+            <div><dt><code>map(pot, 200, 800, 0, 255)</code></dt><dd id="ex-edge-raw"></dd></div>
+            <div><dt>Яркость без <code>constrain()</code></dt><dd id="ex-edge-bits"></dd></div>
+            <div><dt>Яркость с <code>constrain()</code></dt><dd id="ex-edge-safe"></dd></div>
+          </dl>
+        </section>
+
+        <section class="ex-pit" aria-labelledby="ex-pit-3">
+          <div class="ex-pit__text">
+            <h4 id="ex-pit-3">Почему внутри long</h4>
+            <p>В формуле сначала идёт умножение, и число выходит большое: 1023 × 255 = 260865. На Uno тип <code>int</code> хранит числа только до 32767, поэтому уже при pot = 129 произведение не влезет (129 × 255 = 32895).</p>
+            <p>Вот почему map() считает в <code>long</code>: он вмещает числа до 2147483647. Таблица показывает, что вышло бы в <code>int</code>.</p>
+          </div>
+          <dl class="ex-read">
+            <div><dt>Произведение <code>pot × 255</code></dt><dd id="ex-long-prod"></dd></div>
+            <div><dt>Ответ в <code>long</code>, как у map()</dt><dd id="ex-long-ok"></dd></div>
+            <div><dt>Произведение в <code>int</code></dt><dd id="ex-long-wrap"></dd></div>
+            <div><dt>Ответ в <code>int</code></dt><dd id="ex-long-bad"></dd></div>
+          </dl>
+        </section>
+
+        <section class="ex-pit" aria-labelledby="ex-pit-4">
+          <div class="ex-pit__text">
+            <h4 id="ex-pit-4">Для вольт map() не подходит</h4>
+            <p>map() выдаёт только целые числа. Напряжение на A0 плавно идёт от 0 до 5 В, а <code>map(pot, 0, 1023, 0, 5)</code> знает всего шесть ответов. Здесь нужны дроби:</p>
+            <pre class="code ex-line" data-ex-code>float volts = potValue * 5.0 / 1023;</pre>
+            <p>Пиши 5.0 с точкой: иначе деление снова станет целым. Если хочется остаться в целых числах, считай милливольты.</p>
+          </div>
+          <dl class="ex-read">
+            <div><dt><code>map(pot, 0, 1023, 0, 5)</code></dt><dd id="ex-volt-map"></dd></div>
+            <div><dt><code>pot * 5.0 / 1023</code></dt><dd id="ex-volt-real"></dd></div>
+            <div><dt><code>map(pot, 0, 1023, 0, 5000)</code></dt><dd id="ex-volt-milli"></dd></div>
+          </dl>
+        </section>
+      </div>
+    </article>
+  </div>
+</section>

@@ -1,0 +1,216 @@
+/* Раздел #lab: схема рядом с кодом. Код всегда на тёмном фоне, сцена со схемой всегда светлая. */
+.wb-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; }
+.wb-step {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3.25rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 0.98rem/1.2 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+.wb-step b { font: 700 1.15rem/1 var(--font-display); color: var(--ink-2); }
+.wb-step:hover { background: var(--surface-2); }
+.wb-step[aria-pressed='true'] { background: var(--in); border-color: var(--in); color: var(--surface); }
+.wb-step[aria-pressed='true'] b { color: inherit; }
+
+.wb-task { margin-block: 1rem; font-size: var(--fs-lead); max-width: 56em; }
+.wb-task .eyebrow { display: inline; color: var(--in); margin-right: 0.35em; }
+
+.wb-bench { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--gap); }
+.wb-panel { min-width: 0; }
+
+/* Панель кода не задаёт высоту ряда, а заполняет его: скроллится сам код. */
+.wb-panel--code { height: 0; min-height: 100%; background: var(--code-bg); border-color: var(--code-bar); }
+.wb-panel--code .panel__bar { background: var(--code-bar); border-color: var(--code-bar); color: var(--code-ink); }
+.wb-panel--code .btn {
+  background: transparent;
+  border-color: var(--code-dim);
+  color: var(--code-ink);
+}
+.wb-panel--code .btn:hover { background: var(--code-hit); }
+.wb-panel--code .btn[aria-pressed='true'] { background: var(--code-hit); border-color: var(--code-kw); }
+.wb-panel .panel__bar { flex: none; }
+.wb-panel--code .panel__bar { flex-wrap: nowrap; }
+.wb-panel--code .panel__bar .btn { flex: none; padding-inline: 0.6rem; }
+.wb-panel--code .panel__bar .btn--icon { padding: 0; }
+.wb-panel--code .panel__title { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.wb-file { color: var(--code-dim); font-size: 0.8rem; font-weight: 400; background: none; padding: 0; margin-left: 0.3rem; }
+:not(pre) > code.wb-file { background: none; }
+
+.wb-seg { display: inline-flex; }
+.wb-seg .btn { border-radius: 0; margin-left: -1px; }
+.wb-seg .btn:first-child { border-radius: var(--radius) 0 0 var(--radius); margin-left: 0; }
+.wb-seg .btn:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+.wb-seg[hidden] { display: none; }
+
+.wb-stage { aspect-ratio: 174 / 90; min-height: 19rem; flex: 0 0 auto; background: var(--stage); }
+.wb-view { position: absolute; inset: 0; }
+.wb-view[hidden] { display: none; }
+
+/* Сборка по деталям живёт в панели, чтобы работать и в полном экране. */
+.wb-assembly {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.wb-assembly__text { flex: 1 1 14rem; min-width: 0; font-size: 0.95rem; line-height: 1.3; }
+
+.wb-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem 1.1rem;
+  padding: 0.5rem 0.8rem;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+.wb-pot { grid-column: 1 / -1; display: grid; gap: 0; min-width: 0; }
+.wb-pot label { font-size: var(--fs-small); color: var(--ink-2); font-weight: 600; }
+.wb-reads { display: flex; gap: 1.1rem; }
+.wb-read { display: grid; gap: 0.05rem; min-width: 4.2rem; }
+.wb-read span { font-size: 0.78rem; color: var(--ink-2); font-weight: 600; white-space: nowrap; }
+.wb-read b { font: 700 1.3rem/1.15 var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wb-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: flex-end; }
+.wb-actions .btn[hidden] { display: none; }
+
+.wb-controls--code { display: none; background: var(--code-bar); border-color: var(--code-bar); color: var(--code-ink); }
+.wb-controls--code .wb-pot label, .wb-controls--code .wb-read span { color: var(--code-dim); }
+.wb-controls--code .is-in { color: var(--code-kw); }
+.wb-controls--code .is-out { color: var(--code-fn); }
+.wb-controls--code .range { --thumb: var(--code-kw); }
+.wb-controls--code .range::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, var(--code-kw) var(--fill), var(--code-hit) var(--fill));
+}
+.wb-controls--code .range::-webkit-slider-thumb { border-color: var(--code-bar); }
+
+/* --- Код --- */
+.wb-codebody { overflow: auto; background: var(--code-bg); }
+.wb-code {
+  --wb-size: 0.84rem;
+  font-size: calc(var(--wb-size) * var(--wb-font-scale, 1));
+  line-height: 1.55;
+  padding-block: 0.6rem;
+  min-width: max-content;
+}
+.wb-line { display: flex; align-items: baseline; min-height: 1.55em; padding-right: 0.75rem; }
+.wb-line.is-dim { opacity: 0.38; }
+.wb-ln {
+  flex: none;
+  position: sticky;
+  left: 0;
+  width: 3em;
+  padding-right: 0.9em;
+  background: var(--code-bg);
+  color: var(--code-dim);
+  text-align: right;
+  user-select: none;
+  opacity: 0.7;
+}
+.wb-src { white-space: pre; }
+.wb-live {
+  flex: none;
+  position: sticky;
+  right: 0.6rem;
+  margin-left: 1.25rem;
+  padding: 0 0.45em;
+  border-radius: 4px;
+  background: var(--code-hit);
+  color: var(--code-num);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.wb-live[hidden] { display: none; }
+
+.wb-serial { flex: none; border-top: 1px solid var(--code-bar); }
+.wb-serial[hidden] { display: none; }
+.wb-serial__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.8rem;
+  background: var(--code-bar);
+  color: var(--code-ink);
+}
+.wb-serial__name { margin-right: auto; font-weight: 600; font-size: 0.9rem; }
+.wb-serial .btn { min-height: 2rem; padding: 0.1rem 0.6rem; font-size: 0.85rem; }
+.wb-serial__out {
+  height: 6.6rem;
+  margin: 0;
+  padding: 0.4rem 0.8rem;
+  overflow: auto;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  font: 400 0.82rem/1.45 var(--font-mono);
+}
+
+/* --- Полный экран --- */
+.panel:fullscreen .wb-stage, .panel.is-max .wb-stage { aspect-ratio: auto; flex: 1 1 auto; min-height: 0; }
+.panel:fullscreen .wb-controls, .panel.is-max .wb-controls { padding: 0.7rem 1.2rem; }
+.panel:fullscreen .wb-read b, .panel.is-max .wb-read b { font-size: 1.9rem; }
+.panel:fullscreen .wb-assembly__text, .panel.is-max .wb-assembly__text { font-size: 1.15rem; }
+.wb-panel--code:fullscreen, .wb-panel--code.is-max { height: 100vh; height: 100dvh; min-height: 0; background: var(--code-bg); }
+.wb-panel--code:fullscreen .wb-code, .wb-panel--code.is-max .wb-code { --wb-size: clamp(1.1rem, 1.7vw, 1.9rem); }
+.wb-panel--code:fullscreen .wb-controls--code, .wb-panel--code.is-max .wb-controls--code { display: grid; }
+.wb-panel--code:fullscreen .wb-serial__out, .wb-panel--code.is-max .wb-serial__out { height: 8rem; font-size: 1rem; }
+
+/* --- Под панелями --- */
+.wb-below { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: var(--gap); margin-top: 1.75rem; }
+.wb-below > * { min-width: 0; }
+.wb-block { display: grid; gap: 0.6rem; align-content: start; }
+.wb-block--wide { margin-top: 2rem; }
+.wb-block h4 { margin-top: 0.4rem; }
+
+.wb-list { display: grid; gap: 0.15rem; padding-left: 1.8em; }
+.wb-list li::marker { color: var(--ink-2); font-family: var(--font-mono); font-size: 0.9em; }
+.wb-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wb-item:hover { background: var(--surface-2); }
+.wb-list li.is-current .wb-item { background: var(--in-soft); }
+.wb-dot { flex: none; width: 0.75rem; height: 0.75rem; border-radius: 50%; box-shadow: 0 0 0 1px var(--line); transform: translateY(0.05em); }
+.wb-dot--part { border-radius: 2px; background: var(--ink-2); }
+
+.wb-notes { display: grid; gap: 0.4rem; }
+
+.wb-bom { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 0.1rem 2rem; padding: 0; list-style: none; }
+.wb-bom li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.3rem 0; border-bottom: 1px solid var(--line); }
+.wb-bom b { font: 600 0.9rem/1.5 var(--font-mono); white-space: nowrap; }
+
+.wb-fixes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1rem 2rem; }
+.wb-fixes > div { display: grid; gap: 0.2rem; align-content: start; min-width: 0; }
+.wb-fixes h4 { margin-top: 0; }
+.wb-fixnote { margin-top: 0.5rem; }
+
+@media (max-width: 72rem) {
+  .wb-bench { grid-template-columns: minmax(0, 1fr); }
+  .wb-panel--code { height: auto; min-height: 0; max-height: 80vh; }
+}
+@media (max-width: 40rem) {
+  .wb-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wb-step { min-height: 2.9rem; padding: 0.3rem 0.6rem; font-size: 0.92rem; }
+  .wb-controls { grid-template-columns: minmax(0, 1fr); }
+  .wb-actions { justify-content: flex-start; }
+  .wb-reads { flex-wrap: wrap; }
+}

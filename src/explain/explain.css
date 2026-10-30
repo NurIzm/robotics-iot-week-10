@@ -1,0 +1,340 @@
+/* explain.css — герой, #why, #how. */
+#hero [hidden], #why [hidden], #how [hidden] { display: none; }
+
+/* Стол-коврик: тёмный в обеих темах, иначе свечение светодиода не видно.
+   Токены переопределены на месте, поэтому .range, .rulers и .is-in работают здесь без правок. */
+.ex-mat {
+  --bg: var(--code-bg);
+  --surface: var(--code-bg);
+  --surface-2: var(--code-hit);
+  --ink: var(--code-ink);
+  --ink-2: var(--code-dim);
+  --line: var(--code-hit);
+  --in: var(--code-kw);
+  --out: var(--code-fn);
+  color: var(--ink);
+  background-color: var(--code-bg);
+  background-image:
+    linear-gradient(var(--code-bar) 1px, transparent 1px),
+    linear-gradient(90deg, var(--code-bar) 1px, transparent 1px);
+  background-size: 1.6rem 1.6rem;
+}
+
+/* --- Светодиод --- */
+.ex-led-box { position: relative; display: flex; justify-content: center; height: 100%; }
+.ex-led-box::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 33%;
+  width: 180%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.14) 45%, rgba(255, 255, 255, 0));
+  opacity: var(--glow, 0);
+  pointer-events: none;
+}
+.ex-led { position: relative; height: 100%; width: auto; overflow: visible; }
+.ex-led__lit { opacity: var(--glow, 0); }
+
+/* --- Вызов map() одной строкой --- */
+.ex-call {
+  font: 500 1rem/1.4 var(--font-mono);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.ex-call b { font-weight: 700; }
+
+/* --- Герой: единственный крупный жест на странице --- */
+.ex-hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+.ex-hero__in {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+  column-gap: 2rem;
+  padding-block: clamp(1rem, 3vh, 2rem) clamp(0.75rem, 2.5vh, 1.5rem);
+}
+.ex-hero__text { position: relative; z-index: 1; display: grid; gap: 0.9rem; align-content: start; }
+.ex-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 600 var(--fs-small)/1.5 var(--font-mono);
+  color: var(--ink-2);
+}
+.ex-hero__meta li { padding: 0.05rem 0.55rem; border: 1px solid var(--ink-2); border-radius: 4px; }
+.ex-hero h1 {
+  font-size: clamp(2.1rem, min(1rem + 3.5vw, 8.4vh), 4rem);
+  line-height: 1.08;
+  overflow-wrap: break-word;
+}
+.ex-hero__lead { max-width: 37em; font-size: var(--fs-lead); line-height: 1.45; color: var(--ink); }
+
+.ex-hero__led { position: relative; margin: 0; display: grid; align-content: start; justify-items: center; gap: 0.5rem; }
+.ex-hero__led::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 72rem;
+  height: 72rem;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.09) 38%, rgba(255, 255, 255, 0));
+  opacity: var(--glow, 0);
+  pointer-events: none;
+}
+.ex-hero__led .ex-led-box { height: clamp(12rem, 36vh, 19rem); width: 100%; }
+.ex-hero__led .ex-led { transform: rotate(10deg); }
+.ex-hero__led figcaption { position: relative; white-space: nowrap; }
+
+.ex-hero__rulers { grid-column: 1 / -1; position: relative; z-index: 1; margin-top: 1rem; }
+.ex-hero .ruler__head { flex-direction: row-reverse; justify-content: flex-end; align-items: center; gap: 1rem; }
+.ex-hero .ruler__name { font-size: 1rem; color: var(--ink); }
+.ex-hero .ruler__value { font-size: clamp(2.2rem, min(1.2rem + 2.4vw, 6.4vh), 3.2rem); line-height: 1; }
+.ex-hero .ruler__ticks span { font-size: 0.95rem; color: var(--ink); }
+
+/* Большой ползунок: шкала и ход ручки по-прежнему совпадают, поэтому поля шкал равны половине ручки. */
+.ex-hero .range { height: 2.6rem; }
+.ex-hero .range::-webkit-slider-runnable-track { height: 0.9rem; }
+.ex-hero .range::-moz-range-track { height: 0.9rem; }
+.ex-hero .range::-moz-range-progress { height: 0.9rem; }
+.ex-hero .range::-webkit-slider-thumb { width: 2.4rem; height: 2.4rem; margin-top: -0.75rem; border-width: 4px; }
+.ex-hero .range::-moz-range-thumb { width: calc(2.4rem - 8px); height: calc(2.4rem - 8px); border-width: 4px; }
+.ex-hero .ruler__scale, .ex-hero .rulers__link { margin-inline: 1.2rem; }
+.ex-hero .rulers__link { height: 1.9rem; }
+.ex-hero .rulers__link i { display: none; }
+.ex-hero .rulers__link span { background: none; font-size: 1rem; }
+
+/* Нижняя шкала показывает ту же долю такой же полосой. */
+.ex-hero .ruler--out .ruler__scale { height: 3.5rem; }
+.ex-hero .ruler--out .ruler__ticks { top: 0.9rem; }
+.ex-hero .ruler--out .ruler__scale::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--out) var(--ex-fill, 50%), var(--surface-2) var(--ex-fill, 50%));
+}
+.ex-hero .ruler__pin { display: none; }
+
+/* --- #why --- */
+.ex-why { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--gap); align-items: stretch; }
+.ex-bench { display: grid; gap: 1rem; align-content: space-between; padding: 1.25rem; border-radius: var(--radius); overflow: hidden; }
+.ex-bench__leds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.ex-bench__led { margin: 0; display: grid; justify-items: center; align-content: start; text-align: center; gap: 0.2rem; }
+.ex-bench__led figcaption { font-weight: 700; font-size: 1.05rem; }
+.ex-bench__led .ex-led-box { height: 13rem; width: 100%; margin-block: 0.4rem; }
+.ex-bench__num { font: 700 2.4rem/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.ex-bench__note { color: var(--ink-2); font-size: var(--fs-small); }
+.ex-bench .ex-bench__code {
+  margin-top: 0.3rem;
+  padding: 0.1rem 0.4rem;
+  background: var(--code-bar);
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.ex-pot { display: grid; gap: 0.1rem; }
+.ex-bench .ex-pot { order: -1; } /* на широком экране ползунок виден вместе с заголовком раздела */
+.ex-pot__head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; font-weight: 600; }
+.ex-pot__value { font: 700 1.6rem/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+
+.ex-chart { margin: 0; display: grid; gap: 0.6rem; align-content: start; min-width: 0; padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.ex-chart h3 { margin-bottom: 0.5rem; }
+.ex-legend { display: grid; gap: 0.15rem; margin: 0; padding: 0; list-style: none; font-size: var(--fs-small); color: var(--ink-2); }
+.ex-legend li { display: flex; align-items: baseline; gap: 0.5rem; }
+.ex-key { flex: none; width: 1.4rem; height: 3px; border-radius: 2px; transform: translateY(-0.25em); }
+.ex-key--raw { background: var(--in); }
+.ex-key--map { background: var(--out); height: 4px; }
+.ex-chart__svg { touch-action: pan-y; cursor: ew-resize; font-size: 12.5px; }
+.ex-chart__raw { fill: none; stroke: var(--in); stroke-width: 1.6; stroke-linejoin: round; }
+.ex-chart__map { fill: none; stroke: var(--out); stroke-width: 2.6; stroke-linecap: round; }
+.ex-chart__tooth { fill: none; stroke: var(--ink-2); stroke-width: 1; }
+.graph .ex-chart__num { fill: var(--ink); font-weight: 700; }
+.ex-chart__dot-raw { fill: var(--in); stroke: var(--surface); stroke-width: 2.5; }
+
+.ex-why__more { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--gap); margin-top: 2rem; }
+.ex-why__text { display: grid; gap: 0.7rem; align-content: start; justify-items: start; }
+.ex-why__text > p { max-width: 40em; }
+.ex-why__text sup { line-height: 0; }
+#ex-bits-eq { white-space: nowrap; }
+.ex-why__now { padding: 0.5rem 0.75rem; border-left: 3px solid var(--in); background: var(--in-soft); border-radius: 0 var(--radius) var(--radius) 0; font-weight: 500; }
+
+.ex-bits {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 0.2rem;
+  width: 100%;
+  max-width: 34rem;
+  font-family: var(--font-mono);
+}
+.ex-bits__tag { font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+.ex-bits__tag--lost { grid-column: 1 / 3; color: var(--ink-2); }
+.ex-bits__tag--kept { grid-column: 3 / -1; color: var(--out); }
+.ex-bit { display: grid; justify-items: center; }
+.ex-bit b {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 3rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 1.15rem;
+}
+.ex-bit.is-one b { background: var(--out-soft); color: var(--out); }
+.ex-bit--lost b, .ex-bit--lost.is-one b { background: transparent; border: 1px dashed var(--ink-2); color: var(--ink-2); text-decoration: line-through; }
+.ex-bit small { font-size: 0.7rem; color: var(--ink-2); }
+
+/* --- #how: блоки идут лесенкой, слева номер и кому адресован блок --- */
+.ex-block {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  column-gap: 1.5rem;
+  padding-block: 2.25rem;
+  border-top: 1px solid var(--line);
+}
+.ex-block__tag { display: grid; gap: 0.5rem; justify-items: start; align-content: start; }
+.ex-block__num { font: 700 2.6rem/1 var(--font-display); color: var(--ink-2); }
+.ex-block__main { display: grid; gap: 0.9rem; min-width: 0; }
+.ex-block__main > p { max-width: 44em; }
+.ex-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
+.ex-call--plain { margin-top: 0.75rem; font-size: 1.05rem; }
+
+.ex-args { display: grid; grid-template-columns: auto 1.25fr 1fr 1fr 1fr 1fr auto; gap: 0.75rem; align-items: start; }
+.ex-args__brace { font: 700 1.5rem/1.3 var(--font-mono); }
+.ex-arg { display: grid; gap: 0.25rem; padding-top: 0.5rem; border-top: 4px solid var(--in); }
+.ex-arg--out { border-top-color: var(--out); }
+.ex-arg > code { padding: 0; background: none; font-size: 1.05rem; font-weight: 700; color: var(--in); overflow-wrap: normal; }
+.ex-arg--out > code { color: var(--out); }
+.ex-arg p { font-size: var(--fs-small); color: var(--ink-2); }
+.ex-line { padding: 0.7rem 0.9rem; border: 1px solid var(--line); border-radius: var(--radius); overflow-x: auto; white-space: pre-wrap; font-size: 1rem; }
+
+/* --- Лаборатория --- */
+.ex-sets { display: grid; gap: 0.5rem; }
+.ex-sets__row { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 0.25rem 0.75rem; align-items: center; }
+.ex-sets__name { font-size: var(--fs-small); font-weight: 600; color: var(--ink-2); }
+.ex-sets__list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ex-strip { padding: 0.75rem 1rem; border: 1px solid var(--line); border-radius: var(--radius); font-size: clamp(1.05rem, 0.9rem + 0.9vw, 1.6rem); }
+.ex-fields { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.75rem; }
+.ex-field { display: grid; gap: 0.2rem; min-width: 0; }
+.ex-field label { font: 600 var(--fs-small)/1.3 var(--font-mono); color: var(--in); }
+.ex-field--out label { color: var(--out); }
+.ex-field input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--line);
+  border-bottom: 3px solid var(--in);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+  font: 600 1.15rem/1.2 var(--font-mono);
+}
+.ex-field--out input { border-bottom-color: var(--out); }
+.ex-field input[aria-invalid='true'] { border-color: var(--bad); background: var(--bad-soft); }
+.ex-hint { padding: 0.5rem 0.75rem; border-radius: var(--radius); background: var(--bad-soft); color: var(--ink); }
+.ex-outside .ruler__pin { background: var(--bad); }
+.ex-outside .ruler--out .ruler__value { color: var(--bad); }
+.ex-dead { display: grid; gap: 0.5rem; padding: 1rem 1.25rem; border-radius: var(--radius); background: var(--bad-soft); }
+.ex-notes { display: grid; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.ex-notes li { padding: 0.5rem 0.75rem; border-left: 3px solid var(--line); background: var(--bg); border-radius: 0 var(--radius) var(--radius) 0; }
+
+/* --- Разбор вручную --- */
+.ex-hand { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
+.ex-formula { font-size: 0.95rem; }
+.ex-formula .is-in { color: var(--code-kw); }
+.ex-formula .is-out { color: var(--code-fn); }
+.ex-calc { display: grid; gap: 0.9rem; margin: 0; padding: 0; list-style: none; counter-reset: ex-step; }
+.ex-calc li { position: relative; display: grid; gap: 0.3rem; justify-items: start; padding-left: 2.2rem; counter-increment: ex-step; }
+.ex-calc li::before {
+  content: counter(ex-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-2);
+  font: 700 0.9rem/1 var(--font-mono);
+}
+.ex-eq { display: inline-block; max-width: 100%; font-weight: 600; } /* переносится целиком, ломается внутри только если не влезает в колонку */
+.ex-calc__end { margin-top: 0.75rem; padding: 0.6rem 0.75rem; border-left: 3px solid var(--ok); background: var(--ok-soft); border-radius: 0 var(--radius) var(--radius) 0; }
+:not(pre) > code.ex-call--inline { background: none; padding: 0; color: var(--ink); }
+.ex-algebra { display: grid; gap: 0.5rem; }
+#ex-hand-math { display: grid; gap: 0.4rem; }
+
+/* --- Подводные камни --- */
+.ex-pits__bar {
+  position: sticky;
+  top: calc(var(--topbar-h) + 4px);
+  z-index: 5;
+  padding: 0.3rem 0.9rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.ex-pit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; padding-block: 1.25rem; border-top: 1px solid var(--line); }
+.ex-pit:first-of-type { border-top: 0; }
+.ex-pit__text { display: grid; gap: 0.6rem; align-content: start; min-width: 0; }
+.ex-pit__live { display: grid; gap: 1rem; align-content: start; min-width: 0; }
+
+.ex-zones__call { margin-bottom: 0.3rem; font-family: var(--font-mono); font-size: var(--fs-small); }
+.ex-zones__bar { display: flex; gap: 2px; }
+.ex-zones__bar span {
+  display: grid;
+  justify-items: center;
+  min-width: 0.4rem;
+  padding: 0.2rem 0;
+  border-radius: 3px;
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+}
+.ex-zones__bar b { font-size: 1.05rem; line-height: 1.2; }
+.ex-zones__bar small { font-size: 0.75rem; color: var(--ink-2); }
+.ex-zones__bar span.is-on { background: var(--out); color: var(--surface); }
+.ex-zones__bar span.is-on small { color: inherit; }
+.ex-zones__bar span.is-thin { background: var(--out-soft); }
+.ex-zones__bar span.is-thin.is-on { background: var(--out); }
+.ex-zones__tail { margin-top: 0.2rem; text-align: right; font: 500 0.8rem/1.3 var(--font-mono); color: var(--ink-2); }
+
+.ex-read { display: grid; gap: 0; margin: 0; align-content: start; min-width: 0; }
+.ex-read > div { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-block: 0.45rem; border-bottom: 1px solid var(--line); }
+.ex-read dt { min-width: 0; }
+.ex-read dd { margin: 0; flex: none; font: 700 1.35rem/1.2 var(--font-mono); font-variant-numeric: tabular-nums; }
+.ex-read dd.is-bad { color: var(--bad); }
+.ex-read dd.is-good { color: var(--ok); }
+
+/* --- Узкие экраны --- */
+@media (max-width: 62rem) {
+  .ex-hero__in { grid-template-columns: minmax(0, 1fr); }
+  .ex-hero__led { margin-top: 0.75rem; }
+  .ex-hero__led .ex-led-box { height: 11rem; }
+  .ex-why, .ex-why__more, .ex-split, .ex-hand, .ex-pit { grid-template-columns: minmax(0, 1fr); }
+  .ex-block { grid-template-columns: minmax(0, 1fr); row-gap: 0.75rem; }
+  .ex-block__tag { display: flex; align-items: center; gap: 0.75rem; }
+  .ex-args { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+  .ex-arg { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.5rem; padding: 0.35rem 0 0 0.75rem; border-top: 0; border-left: 4px solid var(--in); }
+  .ex-arg--out { border-left-color: var(--out); }
+}
+@media (max-width: 36rem) {
+  .ex-bench .ex-pot { order: 0; } /* на телефоне палец не должен закрывать светодиоды */
+  .ex-hero__led figcaption { white-space: normal; text-align: center; }
+  .ex-strip { font-size: 1rem; }
+  .ex-sets__row { grid-template-columns: minmax(0, 1fr); }
+  .ex-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ex-field--value { grid-column: 1 / -1; }
+  .ex-bench { padding: 1rem 0.75rem; }
+  .ex-bench__led .ex-led-box { height: 10.5rem; }
+  .ex-chart { padding: 1rem 0.75rem; }
+  .ex-bench__num { font-size: 2rem; }
+}
